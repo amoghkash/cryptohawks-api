@@ -3,7 +3,6 @@ const {validateUser} = require('./authController')
 
 const login = async (req, res, next) => {
     // get user information from db
-    console.log(req)
     var dbUser = await getUserFromDB(req, res);
     var responseJSON
     if(dbUser){
@@ -17,7 +16,6 @@ const login = async (req, res, next) => {
             }
         }
     }
-    console.log(res)
     res.json(responseJSON).end()
 }
 
@@ -32,7 +30,6 @@ const signup = async (req, res, next) => {
     } else {
         res.send();
     } */
-    console.log(res)
     res.send()
 }
 
