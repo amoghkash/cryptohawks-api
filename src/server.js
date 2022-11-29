@@ -3,7 +3,6 @@ require('dotenv').config();
 // Import Dependencies
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 
 
 
@@ -24,6 +23,7 @@ database.once('connected', () => {
 // Setup Application
 const app = express();
 app.use(express.json());
+const port = process.env.PORT;
 
 
 // Import Modules and Files
@@ -36,6 +36,6 @@ app.get('/api', (req, res) => {
     res.send("This is Cryptohawks' API");
 });
 
-app.listen(8080, () => {
-    console.log(`Server Started at ${8080}`)
+app.listen(port, () => {
+    console.log(`Server Started at ${port}`)
 })
