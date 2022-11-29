@@ -7,8 +7,8 @@ const mongoose = require('mongoose');
 
 
 // SETUP MONGODB Connection
-const uri = process.env.DATABASE_URL
-mongoose.connect(uri);
+//const uri = process.env.DATABASE_URL
+mongoose.connect("mongodb+srv://urbanarobotics:cryptohawks@userdb.gmtmp2l.mongodb.net/MikeOxlong?retryWrites=true&w=majority");
 const database = mongoose.connection
 
 database.on('error', (error) => {
@@ -30,7 +30,7 @@ const port = process.env.PORT;
 const userRouter = require('./routes/user');
 
 
-app.use('/api/user', userRouter)
+app.use('/user', userRouter)
 
 app.get('/api', (req, res) => {
     res.send("This is Cryptohawks' API");
