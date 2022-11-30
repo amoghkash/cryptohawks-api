@@ -3,6 +3,7 @@ const {validateUser} = require('./authController')
 
 const login = async (req, res, next) => {
     // get user information from db
+    res.set('Access-Control-Allow-Origin', '*');
     var dbUser = await getUserFromDB(req, res);
     var responseJSON
     if(dbUser){
@@ -20,7 +21,6 @@ const login = async (req, res, next) => {
 }
 
 const signup = async (req, res, next) => {
-    res.set('Access-Control-Allow-Origin', '*');
     var success = await addUserToDB(req, res);
     // TODO Add token
     /* if(success) {

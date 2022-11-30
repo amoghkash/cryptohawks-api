@@ -5,11 +5,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const cors=require("cors");
-const corsOptions ={
-   origin:'*', 
-   credentials:true,            //access-control-allow-credentials:true
-   optionSuccessStatus:200,
-}
 
 
 
@@ -30,7 +25,7 @@ database.once('connected', () => {
 // Setup Application
 const app = express();
 app.use(express.json())
-app.use(cors(corsOptions))
+app.use(cors())
 const port = process.env.PORT;
 
 
