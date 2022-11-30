@@ -3,18 +3,20 @@ const {validateUser} = require('./authController')
 
 const login = async (req, res, next) => {
     // get user information from db
-    res.set('Access-Control-Allow-Origin', '*');
+    console.log(req.body)
     var dbUser = await getUserFromDB(req, res);
     var responseJSON
     if(dbUser){
         if(validateUser(req, dbUser)) {
             responseJSON = dbUser.toJSON()
             responseJSON.valid = true
-        } else {
-            var responseJSON = {
-                valid:false, 
-                issue: "Wrong Username or Password"
-            }
+            res.status(200)
+        }
+    } else {
+        console.log("b1")
+        var responseJSON = {
+            valid:false, 
+            issue: "Wrong Username or Password"
         }
     }
     res.json(responseJSON).end()

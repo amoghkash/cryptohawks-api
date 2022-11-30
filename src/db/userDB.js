@@ -17,7 +17,7 @@ async function getUserFromDB(req, res) {
     if (user) {
         return user;
     } else {
-        res.status(404).send("USER NOT FOUND");
+        res.status(404);
     }
 }
 
