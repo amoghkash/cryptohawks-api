@@ -3,7 +3,7 @@ require('dotenv').config();
 // Import Dependencies
 const express = require('express');
 const mongoose = require('mongoose');
-
+const cookieParser = require('cookie-parser')
 const cors=require("cors");
 
 
@@ -24,8 +24,12 @@ database.once('connected', () => {
 
 // Setup Application
 const app = express();
-app.use(cors())
+app.use(cors({
+    origin:'http://localhost:5173',
+    credentials:true
+})) // MUST BE BEFORE express.json()
 app.use(express.json())
+app.use(cookieParser());
 
 const port = process.env.PORT;
 

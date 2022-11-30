@@ -31,8 +31,9 @@ async function addUserToDB(req, res) {
     changeCollection('users');
     inputUsername = req.body.username.trim();
     let user = await User.findOne({ username: inputUsername }); // See if User exists
+    console.log(user)
     if (user) {
-        res.status(440).send('That user already exists!');
+        res.status(440); // User Already Exists, this is put into bodyof response when it goes back to controller
         return false;
     } else { // Create User
         user = new User({
