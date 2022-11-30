@@ -16,10 +16,10 @@ const login = async (req, res, next) => {
             }
             res.status(200)
             const authToken = generateToken(req.body.username.trim())
-            res.cookie("token", authToken, {httpOnly:true, maxAge: maxSensitiveCookieAge})
-            res.cookie("tokenSet", "true", {maxAge: maxSensitiveCookieAge})
-            res.cookie("username", dbUser.username)
-            res.cookie("name", dbUser.name)
+            res.cookie("token", authToken, {httpOnly:true, maxAge: maxSensitiveCookieAge, secure: true})
+            res.cookie("tokenSet", "true", {maxAge: maxSensitiveCookieAge, secure: true})
+            res.cookie("username", dbUser.username, {secure: true})
+            res.cookie("name", dbUser.name, {secure: true})
         } else {    // If password is wrong
             var responseJSON = {
                 valid:false, 
@@ -40,10 +40,10 @@ const signup = async (req, res, next) => {
 
     if(success) {
         const authToken = generateToken(req.body.username);
-        res.cookie("token", authToken, {httpOnly:true, maxAge: maxSensitiveCookieAge})
-        res.cookie("tokenSet", "true", {maxAge: maxSensitiveCookieAge})
-        res.cookie("username", req.body.username)
-        res.cookie("name", req.body.name)
+        res.cookie("token", authToken, {httpOnly:true, maxAge: maxSensitiveCookieAge, secure: true})
+        res.cookie("tokenSet", "true", {maxAge: maxSensitiveCookieAge, secure: true})
+        res.cookie("username", req.body.username, {secure: true})
+        res.cookie("name", req.body.name, {secure: true})
         res.cookie("firsttime", true)
         res.status(201);
         var responseJSON = {
