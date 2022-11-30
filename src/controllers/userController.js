@@ -17,9 +17,9 @@ const login = async (req, res, next) => {
             res.status(200)
             const authToken = generateToken(req.body.username.trim())
             res.cookie("token", authToken, {httpOnly:true, maxAge: maxSensitiveCookieAge, secure: true, sameSite:'None'})
-            res.cookie("tokenSet", "true", {maxAge: maxSensitiveCookieAge})
-            res.cookie("username", dbUser.username)
-            res.cookie("name", dbUser.name)
+            responseJSON.tokenSet = true
+            responseJSON.username = dbUser.username
+            responseJSON.name = dbUser.name
         } else {    // If password is wrong
             var responseJSON = {
                 valid:false, 
