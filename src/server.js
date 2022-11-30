@@ -25,7 +25,6 @@ database.once('connected', () => {
 // Setup Application
 const app = express();
 app.use(cors({
-    origin:'http://localhost:5173',
     credentials:true
 })) // MUST BE BEFORE express.json()
 app.use(express.json())
