@@ -27,6 +27,7 @@ const app = express();
 app.use(cors({
     origin:'https://amoghkash.github.io',
     credentials:true,
+    allowedHeaders:'Content-Type,Authorization',
     optionsSuccessStatus: 200
 })) // MUST BE BEFORE express.json()
 app.use(cookieParser());
