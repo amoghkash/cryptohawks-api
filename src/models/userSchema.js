@@ -16,9 +16,24 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         maxlength: 1024
+    },
+    subteam: {
+        type: String,
+        required: true,
+        maxlength: 1024
+    },
+    date_account_created: {
+        type: Number,
+        required: true,
+        maxlength: 100
     }
 });
 
+// TODO
+// Add Subteam
+// Add account creation day
+// Add last account sign in
+// Add admin status field
 const User = mongoose.model('user', UserSchema)
 
 module.exports ={ User };

@@ -3,7 +3,8 @@ const {validateUser} = require('./authController')
 const { generateToken } = require('../scripts/jwt'); // JWT Verification
 const { validateSignupInput, validateLoginInput } = require('../scripts/inputValidation')
 
-const maxSensitiveCookieAge = 86400000
+const maxSensitiveCookieAge = 86400000 // 1 day
+
 
 const login = async (req, res, next) => {
     const {error} = validateLoginInput(req.body);
@@ -13,14 +14,15 @@ const login = async (req, res, next) => {
         console.log(dbUser)
         if(dbUser){
             if(validateUser(req, dbUser)) {
+                const authToken = generateToken(req.body.username.trim())
                 responseJSON = {
                     valid:true,
                     username: dbUser.username,
-                    name: dbUser.name
+                    name: dbUser.name,
+                    access_token: authToken,
+                    token_expires_in: maxSensitiveCookieAge
                 }
-                res.status(200)
-                const authToken = generateToken(req.body.username.trim())
-                res.cookie("token", authToken, {httpOnly:true, maxAge: maxSensitiveCookieAge, secure: true, sameSite:'None'})
+                res.status(200)     
                 responseJSON.tokenSet = true
             } else {    // If password is wrong
                 responseJSON = {

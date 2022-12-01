@@ -36,10 +36,13 @@ async function addUserToDB(req, res) {
         res.status(440); // User Already Exists, this is put into bodyof response when it goes back to controller
         return false;
     } else { // Create User
+        const time = Date.now()
         user = new User({
             username: inputUsername,
             name: req.body.name.trim(),
-            password: req.body.password.trim()
+            password: req.body.password.trim(),
+            subteam: req.body.subteam,
+            date_account_created: time
         });
         await user.save();
         console.log('User Saved');
