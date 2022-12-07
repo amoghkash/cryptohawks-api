@@ -6,33 +6,37 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 200
     },
     name: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 200
     },
     password: {
         type: String,
         required: true,
-        maxlength: 1024
+        maxlength: 200
     },
     subteam: {
-        type: String,
+        type: Object,
         required: true,
-        maxlength: 1024
     },
-    date_account_created: {
+    grade: {
         type: Number,
+    },
+    tasks: {
+        type: Array,
         required: true,
-        maxlength: 100
+    },
+    admin: {
+        type: Boolean,
+        required: true,
     }
-});
+},  {timestamps: true });
 
 // TODO
-// Add Subteam
-// Add account creation day
-// Add last account sign in
 // Add admin status field
 const User = mongoose.model('user', UserSchema)
 

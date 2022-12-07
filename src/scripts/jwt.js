@@ -45,7 +45,7 @@ async function parse(token) {
      }
     }
     return null;
-   };
+};
 
 
 module.exports = { generateToken, parse };

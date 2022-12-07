@@ -11,12 +11,12 @@ router.post('/signup', userController.signup);
 router.post('/login', userController.login);
 
 // Get User - GET
-router.get('/', (req, res) => {
-    res.send("Find or Create a User");
-});
+router.get('/', userController.returnUser);
 
 // Update User - PATCH
 
 
+// Get List of Tasks
+router.get('/:username/tasks', userController.returnUserTaskList)
 
 module.exports = router;

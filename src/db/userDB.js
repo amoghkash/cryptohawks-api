@@ -4,7 +4,7 @@ const { changeCollection } = require('./connectDB')
 
 
 // Gets user and returns user as JSON Object
-async function getUserFromDB(req, res) {
+async function getUserFromDB(targetUser) {
     // TODO Add login validation
     /*  const {error} = validate.Login(req.body);
     if (error) {
@@ -12,8 +12,7 @@ async function getUserFromDB(req, res) {
         return false;
     }; */
     changeCollection('users');
-    inputUsername = req.body.username.trim();
-    let user = await User.findOne({ username: inputUsername });
+    let user = await User.findOne({ username: targetUser });
     if (user) {
         return user;
     } else {
@@ -31,18 +30,19 @@ async function addUserToDB(req, res) {
     changeCollection('users');
     inputUsername = req.body.username.trim();
     let user = await User.findOne({ username: inputUsername }); // See if User exists
-    console.log(user)
     if (user) {
         res.status(440); // User Already Exists, this is put into bodyof response when it goes back to controller
         return false;
     } else { // Create User
-        const time = Date.now()
+        let subteamValue = req.body.subteam
         user = new User({
             username: inputUsername,
             name: req.body.name.trim(),
             password: req.body.password.trim(),
-            subteam: req.body.subteam,
-            date_account_created: time
+            subteam: subteamValue,
+            tasks: [0],
+            grade: req.body.grade[0].content,
+            admin: req.body.admin
         });
         await user.save();
         console.log('User Saved');

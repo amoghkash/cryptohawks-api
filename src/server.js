@@ -25,7 +25,7 @@ database.once('connected', () => {
 // Setup Application
 const app = express();
 app.use(cors({
-    origin:'https://amoghkash.github.io',
+    origin:'*',
     credentials:true,
     allowedHeaders:'Content-Type,Authorization',
     optionsSuccessStatus: 200
@@ -38,9 +38,14 @@ const port = process.env.PORT;
 
 // Import Modules and Files
 const userRouter = require('./routes/user');
+const taskRouter = require('./routes/task');
+
+
 
 
 app.use('/user', userRouter)
+app.use('/task', taskRouter)
+
 
 app.get('/api', (req, res) => {
     res.send("This is Cryptohawks' API");
