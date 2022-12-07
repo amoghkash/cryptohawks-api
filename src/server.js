@@ -25,7 +25,7 @@ database.once('connected', () => {
 // Setup Application
 const app = express();
 app.use(cors({
-    origin:'*',
+    origin:'https://amoghkash.github.io',
     credentials:true,
     allowedHeaders:'Content-Type,Authorization',
     optionsSuccessStatus: 200
