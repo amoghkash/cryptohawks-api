@@ -24,7 +24,10 @@ function validateTaskCreation(task) {
     const schema = Joi.object({
         title: Joi.string().required(),
         description: Joi.string().required(),
-        assignee: Joi.string()
+        assignee: Joi.string(),
+        startDate: Joi.date(),
+        endDate: Joi.date(),
+        type: Joi.string().required()
     });
     return schema.validate(task);
 }

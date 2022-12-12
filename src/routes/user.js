@@ -19,4 +19,6 @@ router.get('/', userController.returnUser);
 // Get List of Tasks
 router.get('/:username/tasks', userController.returnUserTaskList)
 
+// Get List of Tasks
+router.get('/all', userController.returnAllUsers)
 module.exports = router;

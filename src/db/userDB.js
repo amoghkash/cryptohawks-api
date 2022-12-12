@@ -5,18 +5,23 @@ const { changeCollection } = require('./connectDB')
 
 // Gets user and returns user as JSON Object
 async function getUserFromDB(targetUser) {
-    // TODO Add login validation
-    /*  const {error} = validate.Login(req.body);
-    if (error) {
-        res.status(400).send(error.details[0].message); // DO NOT USE res.send
-        return false;
-    }; */
     changeCollection('users');
     let user = await User.findOne({ username: targetUser });
     if (user) {
         return user;
     } else {
-        res.status(404);
+        return null
+    }
+}
+
+// Gets user and returns alluser as JSON Object
+async function getAllUserFromDB() {
+    changeCollection('users');
+    let user = await User.distinct('username');
+    if (user) {
+        return user;
+    } else {
+        return null
     }
 }
 
@@ -50,7 +55,21 @@ async function addUserToDB(req, res) {
     };
 }
 
-module.exports = { getUserFromDB, addUserToDB };
+async function addTaskToUser(targetUser, taskUID) {
+    User.findOneAndUpdate(
+    { username: targetUser}, 
+    { $push: { tasks: taskUID  } },
+    function (error, success) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log(success);
+            }
+    });
+}
+
+
+module.exports = { getUserFromDB, addUserToDB, getAllUserFromDB, addTaskToUser};
 
 
 

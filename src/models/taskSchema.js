@@ -27,6 +27,16 @@ const TaskSchema = new mongoose.Schema({
     percentCompleted: {
         type: Number,
         required: true,
+    },
+    startDate: {
+        type: Date,
+    },
+    endDate: {
+        type: Date
+    },
+    type: {
+        type: String,
+        required: true,
     }
 });
 

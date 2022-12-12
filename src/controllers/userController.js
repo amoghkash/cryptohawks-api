@@ -1,4 +1,4 @@
-const { getUserFromDB, addUserToDB } = require('../db/userDB');
+const { getUserFromDB, addUserToDB, getAllUserFromDB} = require('../db/userDB');
 const {validateUser} = require('./authController')
 const { generateToken, parse } = require('../scripts/jwt'); // JWT Verification
 const { validateSignupInput, validateLoginInput } = require('../scripts/inputValidation')
@@ -16,15 +16,18 @@ const login = async (req, res, next) => {
         if(dbUser){
             if(validateUser(req, dbUser)) {
                 const authToken = generateToken(req.body.username.trim())
+                console.log(dbUser)
                 responseJSON = {
                     valid:true,
                     username: dbUser.username,
                     name: dbUser.name,
                     access_token: authToken,
-                    token_expires_in: maxSensitiveCookieAge
+                    token_expires_in: maxSensitiveCookieAge,
+                    admin: dbUser.admin
                 }
-                res.status(200)     
+                res.status(200)
                 responseJSON.tokenSet = true
+                console.log(responseJSON)
             } else {    // If password is wrong
                 responseJSON = {
                     valid:false, 
@@ -102,7 +105,6 @@ const returnUser = async (req, res, next) => {
 }
 
 const returnUserTaskList = async (req, res, next) => {
-    var responseJSON;
     let req_username = req.params.username;
     const userdata_temp = await getUserFromDB(req_username)
     let returnObject = {}
@@ -112,7 +114,16 @@ const returnUserTaskList = async (req, res, next) => {
         for (let index = 0; index < taskArray.length; index++) {
             const element = taskArray[index];
             task = await db_getTask(element)
-            returnObject[index] = task
+            var user;
+            if(task){
+                if(task.assignee){
+                    user = await getUserFromDB(task.assignee) 
+                }
+                if(user){
+                    task.assignee=user.name
+                }
+                returnObject[index] = task
+            }
         }
         res.status(200)
     }
@@ -120,4 +131,22 @@ const returnUserTaskList = async (req, res, next) => {
     res.end()
 }
 
-module.exports = { login, signup, returnUser, returnUserTaskList};
+const returnAllUsers = async (req, res, next) => {
+    const userdata_array = await getAllUserFromDB()
+    let returnObject = {}
+    if(userdata_array) {
+        for (let index = 0; index < userdata_array.length; index++) {
+            const element = userdata_array[index];
+            let user = await getUserFromDB(element)
+            returnObject[element] = user.name
+        }
+        res.status(200)
+    }
+    res.json(returnObject)
+    res.end()
+}
+
+
+
+
+module.exports = { login, signup, returnUser, returnUserTaskList, returnAllUsers};
