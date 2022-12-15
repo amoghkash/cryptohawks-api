@@ -1,9 +1,10 @@
 // This file defines the User Model for MongoDB - User Schema
 
 // Import packages
-const { boolean } = require('joi');
 const mongoose = require('mongoose');
 
+
+// Create Schema
 const TaskSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -39,12 +40,13 @@ const TaskSchema = new mongoose.Schema({
         required: true,
     }
 });
+// TODO - Change "Assignee" to Owner or Responsible
+// TODO - Add support for multiple assignee
 
-// TODO
-// Add Subteam
-// Add account creation day
-// Add last account sign in
-// Add admin status field
-const Task = mongoose.model('tasks', TaskSchema)
 
+// Connect Schema to collection in a model
+const Task = mongoose.model('tasks', TaskSchema);
+
+
+// Export Model
 module.exports ={ Task };

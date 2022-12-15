@@ -1,3 +1,4 @@
+///////////////////////// APPLICATION SETUP START
 require('dotenv').config();
 
 // Import Dependencies
@@ -6,51 +7,62 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser')
 const cors=require("cors");
 
-
-
-// SETUP MONGODB Connection
-//const uri = process.env.DATABASE_URL
+// Create MongoDB Connection
 mongoose.connect("mongodb+srv://urbanarobotics:cryptohawks@userdb.gmtmp2l.mongodb.net/MikeOxlong?retryWrites=true&w=majority");
 const database = mongoose.connection
 
+// Throw error if there is an error connection
 database.on('error', (error) => {
     console.log(error)
 })
 
+// Connection Confirmation
 database.once('connected', () => {
     console.log('Database Connected');
 })
 
-
 // Setup Application
-const app = express();
+const app = express(); // Create Express App
+
+
+// !!! ONLY CHANGE ORIGIN DURING DEVELOPMENT
+// Setup CORS Settings  
+// Must be before express.json()
 app.use(cors({
-    origin:'https://amoghkash.github.io',
+    origin:'https://amoghkash.github.io', // Prod Link: 'https://amoghkash.github.io'  Dev Link: 'http://localhost:5173'
     credentials:true,
     allowedHeaders:'Content-Type,Authorization',
     optionsSuccessStatus: 200
-})) // MUST BE BEFORE express.json()
-app.use(cookieParser());
-app.use(express.json())
+})) 
 
+app.use(cookieParser()); // Setup Cookie Parser
+app.use(express.json()); // Setup Read ability for Request Body
+
+// Set Server Port
 const port = process.env.PORT;
 
+///////////////////////// APPLICATION SETUP END
+
+
+
+
+///// APPLICATION START
 
 // Import Modules and Files
 const userRouter = require('./routes/user');
 const taskRouter = require('./routes/task');
 
+// Link Routers
+app.use('/user', userRouter);
+app.use('/task', taskRouter);
 
-
-
-app.use('/user', userRouter)
-app.use('/task', taskRouter)
-
-
+// Get Request to Main API Link
+// Validates that API is live
 app.get('/api', (req, res) => {
     res.send("This is Cryptohawks' API");
 });
 
+// Start the Server
 app.listen(port, () => {
-    console.log(`Server Started at ${port}`)
+    console.log(`Server Started at ${port}`);
 })

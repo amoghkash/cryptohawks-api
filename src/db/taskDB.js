@@ -1,26 +1,36 @@
 const { changeCollection } = require('./connectDB') 
 const { Task } = require('../models/taskSchema')
 const mongoose = require('mongoose');
-const { returnUserTaskList } = require('../controllers/userController');
 
 
-// Create Task
-// Parameters: Task Title, Task Description, Task Subteam, Task Creator
+// Function Name: db_createTask
+// Function Description: Creates Task in Task database
+// Function Param: request - username
+// Function Param: response
+// Function Returns: Task Document
+// Function Throws: None
+/* 
+    Function Notes:
+        - Has to be an asyncronous function
+        - Must be used with await
+        - Implemented in taskController.js
+*/
 async function db_createTask(req, res) {
-    // TODO Add validation
-    /* const {error} = validate.SignUp(req.body);
-    if (error) {
-        res.status(400).send(error.details[0].message) /// DO NOT USE res.send
-        return false;
-    }; */
+    // Change Collection
     changeCollection('tasks');
-    const taskID = await getCurrentUID()
+    
+    // Get new UID for task
+    const taskID = await getNextUID()
+
+    // Declare Assignee
     let assigneeVar
-    if(!req.body.assignee) {
-        assigneeVar = ""
-    } else {
-        assigneeVar= req.body.assignee
+    if(!req.body.assignee) { // If Assignee doesn't exist
+        assigneeVar = "" // assignee is empty
+    } else { // If Assignee exists
+        assigneeVar= req.body.assignee // Assignee is set
     }
+
+    // Create new task
     let task = new Task({
         title: req.body.title.trim(),
         uid: taskID,
@@ -32,83 +42,176 @@ async function db_createTask(req, res) {
         endDate: req.body.endDate,
         type: req.body.type
     });
-
+    
+    // Save Task into Database
     await task.save()
+
+    // Return Task
     return task
 }
+// TODO - Return Boolean
+// TODO - Change param to only include req.body
 
 
-// Get Task
-// Parameters: Task ID (maybe Task Title?)
-// Gets user and returns user as JSON Object
+
+
+// Function Name: db_getTask
+// Function Description: Gets Task from Task database
+// Function Param: taskUID - the id of task being requested
+// Function Returns: Task Document
+// Function Throws: None
+/* 
+    Function Notes:
+        - Has to be an asyncronous function
+        - Must be used with await
+        - Implemented in taskController.js
+*/
 async function db_getTask(taskUID) {
+    // Change Collection
     changeCollection('tasks');
+
+    // Find task
     let task = await Task.findOne({ uid: taskUID });
-    if(task==null) {
-    } else{
-        task = task.toJSON()
-        if (task) {
-            delete task.__v
+
+    if(task==null) { // If task not found
+    } else{ // If Task Found
+        task = task.toJSON() // Convert task to JSON
+        if (task) { // If task still exists
+            
+            // Delete sensitive task variables
+            delete task.__v 
             delete task._id
+
+            // Return Task
             return task
         } else {
+
+            // TODO - Remove response status
             res.status(404);
         }
     }
 }
+// FIXME - Fix all task handling
 
-// Delete Task
-// Paramters: Task to Modify(ID), (Value to Change), (New Value)
 
-// Modify Task
-// Paramters: Task to Modify(ID), (Value to Change), (New Value)
+
+
+
+// Function Name: db_updateTask
+// Function Description: Updated Task in Task database
+// Function Param: taskUID - the id of task being requested
+// Function Param: request
+// Function Returns: True or None
+// Function Throws: None
+/* 
+    Function Notes:
+        - Has to be an asyncronous function
+        - Must be used with await
+        - Implemented in taskController.js
+*/
 async function db_updateTask(taskUID, req) {
+    // Change Collection
     changeCollection('tasks');
-    console.log(taskUID)
+    //console.log(taskUID) // For Debug
+
+    // Find Task
     let task = await Task.findOne({ uid: taskUID });
-    console.log(task)
+    //console.log(task) // For Debug
+
+    // If title exists in req.body, update it
     if(req.body.title) {
-        console.log(req.body.title)
-        task.title = req.body.title
+        // console.log(req.body.title) // For Debug
+        task.title = req.body.title // Set New Title
     }
+
+    // If description exists in req.body, update it
     if(req.body.description) {
-        task.description = req.body.description
+        task.description = req.body.description // Set New Description
     }
+
+    // If assignee exists in req.body, update it
     if(req.body.assignee) {
-        task.assignee = req.body.assignee 
+        task.assignee = req.body.assignee // Set New Assignee
+        //TODO: Add support to remove task from current assignee
     }
+
+    // If progress exists in req.body, update it
     if(req.body.progress) {
-        task.percentCompleted=req.body.progress
-        if(req.body.progress == 100){
+        task.percentCompleted=req.body.progress // Set New percentCompleted
+
+        // Set is completed field
+        if(req.body.progress == 100){ // if progress is 100%
             task.isCompleted = true
-        } else {
+        } else { // if progress is not 100%
             task.isCompleted = false
         }
     }
+
+    // If startDate exists in req.body, update it
     if(req.body.startDate) {
-        task.startDate=req.body.startDate
+        task.startDate=req.body.startDate // Set New startDate
     }
+
+    // If endDate exists in req.body, update it
     if(req.body.endDate) {
-        task.endDate=req.body.endDate
+        task.endDate=req.body.endDate // Set New endDate
     }
-    console.log(task)
+
+    //console.log(task) // For Debug
+
+    // Save Task to Database
     task.save()
+
+    // Return True
     return true
 }
-// Get Current UID
-// Return: Current UID number
+// TODO - Pass req.body as param, not whole req
 
-async function getCurrentUID() {
+
+
+
+
+// Function Name: getNextUID
+// Function Description: Get next available UID
+// Function Param: None
+// Function Returns: UID:number
+// Function Throws: None
+/* 
+    Function Notes:
+        - Has to be an asyncronous function
+        - Must be used with await
+*/
+async function getNextUID() {
+
+    // Get the current Max UID Task Value from DB
     let maxObj = await Task.aggregate()
     .group({ _id: null, num: { $max: '$uid' } })
     .exec()
-    if(maxObj.length == 0){
-        return 0 // First Task Index
+    // Returns array with object in postion 0
+
+    
+    if(maxObj.length == 0){  // If maxObj is empty
+        return 0 // Return first Task in database index
     }
+
+    // Access number from array and add one to it
     let newUID = maxObj[0].num +1
+
+    // Return next number
     return(newUID)
 }
 
-module.exports = {db_createTask, db_getTask, db_updateTask, getCurrentUID}
+
+
+
+// TODO - Create Delete Task
+// Paramters: Task to Modify(ID), (Value to Change), (New Value)
+
+
+
+
+
+// Export Functions
+module.exports = {db_createTask, db_getTask, db_updateTask, getNextUID}
 
 

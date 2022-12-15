@@ -1,27 +1,24 @@
 // Include Packages
 const express = require('express');
-const router = express.Router();
-const taskController = require('../controllers/taskController');
+const router = express.Router(); // Create Router
+const taskController = require('../controllers/taskController'); // Import Controller
 
 
-// Post: Create a task
+// Create a task
 router.post('/', taskController.createTask);
-
-
 
 // Get All Tasks
 router.get('/all', taskController.returnAllTasks);
 
-// Get User - GET
+// Get a Task
 router.get('/:taskID', taskController.getTask);
 
-// Update User - PATCH
-router.put('/', taskController.updateTask)
-// Get: Get a task
+// Update a task
+router.put('/', taskController.updateTask);
+
+// Delete a Task
+// TODO - Add support for deleting a task
 
 
-// Patch: Update a task
-
-// Delete: Delete a Task
-
+// Export Router
 module.exports = router;

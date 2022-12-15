@@ -2,6 +2,7 @@
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 
+// Set Variables
 const jwtKey = "my_secret_key"; //probably have to change later
 const jwtExpiry= '60d'; //how long before new one in seconds
 
@@ -18,11 +19,12 @@ const jwtExpiry= '60d'; //how long before new one in seconds
         - Use RSA SHA256 to generate the token
         - Use the userId to generate the token
         - Secret key is stored in the .env file
-        - Timeout time = 1hr
+        - Timeout time = jwtExpiry
 */
 function generateToken(uid) {
-    return jwt.sign(uid, jwtKey);
+    return jwt.sign(uid, jwtKey);  
 };
+// TODO - Set JWT Expiry
 
 
 // Function Name: parse

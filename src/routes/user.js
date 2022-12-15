@@ -1,7 +1,7 @@
 // Include Packages
 const express = require('express');
-const router = express.Router();
-const userController = require('../controllers/userController');
+const router = express.Router(); // Create Router
+const userController = require('../controllers/userController'); // Import Controller
 
 
 // Sign-Up
@@ -14,11 +14,14 @@ router.post('/login', userController.login);
 router.get('/', userController.returnUser);
 
 // Update User - PATCH
-
-
-// Get List of Tasks
-router.get('/:username/tasks', userController.returnUserTaskList)
+// TODO - Add support for Updating User
 
 // Get List of Tasks
-router.get('/all', userController.returnAllUsers)
+router.get('/:username/tasks', userController.returnUserTaskList);
+
+// Get List of Users
+router.get('/all', userController.returnAllUsers);
+
+
+// Export Router
 module.exports = router;

@@ -3,6 +3,8 @@
 // Import packages
 const mongoose = require('mongoose');
 
+
+// Create Schema
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -36,8 +38,10 @@ const UserSchema = new mongoose.Schema({
     }
 },  {timestamps: true });
 
-// TODO
-// Add admin status field
-const User = mongoose.model('user', UserSchema)
 
+// Connect Schema to collection in a model
+const User = mongoose.model('user', UserSchema);
+
+
+// Export Model
 module.exports ={ User };
