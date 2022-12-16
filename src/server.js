@@ -62,7 +62,16 @@ app.get('/api', (req, res) => {
     res.send("This is Cryptohawks' API");
 });
 
+app.get('/version', (req, res) => {
+    res.json({"id":"1.0.0"});
+    res.status(200)
+    res.send()
+    res.end()
+});
+
+
 // Start the Server
 app.listen(port, () => {
     console.log(`Server Started at ${port}`);
 })
+
