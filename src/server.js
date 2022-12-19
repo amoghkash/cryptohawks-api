@@ -9,6 +9,7 @@ const cors=require("cors");
 
 // Create MongoDB Connection
 mongoose.connect("mongodb+srv://urbanarobotics:cryptohawks@userdb.gmtmp2l.mongodb.net/MikeOxlong?retryWrites=true&w=majority");
+mongoose.set('strictQuery', false);
 const database = mongoose.connection
 
 // Throw error if there is an error connection
@@ -29,7 +30,7 @@ const app = express(); // Create Express App
 // Setup CORS Settings  
 // Must be before express.json()
 app.use(cors({
-    origin:'https://amoghkash.github.io', // Prod Link: 'https://amoghkash.github.io'  Dev Link: 'http://localhost:5173'
+    origin:'http://localhost:5173', // Prod Link: 'https://amoghkash.github.io'  Dev Link: 'http://localhost:5173'
     credentials:true,
     allowedHeaders:'Content-Type,Authorization',
     optionsSuccessStatus: 200
@@ -37,6 +38,7 @@ app.use(cors({
 
 app.use(cookieParser()); // Setup Cookie Parser
 app.use(express.json()); // Setup Read ability for Request Body
+
 
 // Set Server Port
 const port = process.env.PORT;
