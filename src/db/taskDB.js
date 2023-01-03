@@ -1,7 +1,7 @@
 const { changeCollection } = require('./connectDB') 
 const { Task } = require('../models/taskSchema')
 const mongoose = require('mongoose');
-
+const {getUserFromDB, addTaskToUser, db_removeTaskFromUser} = require('../db/userDB')
 
 // Function Name: db_createTask
 // Function Description: Creates Task in Task database
@@ -113,7 +113,7 @@ async function db_updateTask(taskUID, req) {
     // Change Collection
     changeCollection('tasks');
     //console.log(taskUID) // For Debug
-
+    taskUID = Number(taskUID)
     // Find Task
     let task = await Task.findOne({ uid: taskUID });
     //console.log(task) // For Debug
@@ -131,6 +131,8 @@ async function db_updateTask(taskUID, req) {
 
     // If assignee exists in req.body, update it
     if(req.body.assignee) {
+        db_removeTaskFromUser(task.assignee, taskUID);
+        addTaskToUser(req.body.assignee, taskUID);
         task.assignee = req.body.assignee // Set New Assignee
         //TODO: Add support to remove task from current assignee
     }
@@ -169,6 +171,18 @@ async function db_updateTask(taskUID, req) {
 
 
 
+// Delete Task
+// Paramters: Task to Delete(ID)
+async function db_deleteTask(taskUID) {
+    // Change Collection
+    changeCollection('tasks');
+
+    // Find task
+    let task = await Task.deleteOne({ uid: taskUID });
+    return true
+}
+
+
 
 
 // Function Name: getNextUID
@@ -204,14 +218,8 @@ async function getNextUID() {
 
 
 
-// TODO - Create Delete Task
-// Paramters: Task to Modify(ID), (Value to Change), (New Value)
-
-
-
-
 
 // Export Functions
-module.exports = {db_createTask, db_getTask, db_updateTask, getNextUID}
+module.exports = {db_createTask, db_getTask, db_updateTask, db_deleteTask, getNextUID}
 
 

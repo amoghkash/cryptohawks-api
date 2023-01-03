@@ -17,8 +17,7 @@ router.get('/:taskID', taskController.getTask);
 router.put('/', taskController.updateTask);
 
 // Delete a Task
-// TODO - Add support for deleting a task
-
+router.delete('/:taskID', taskController.deleteTask);
 
 // Export Router
 module.exports = router;

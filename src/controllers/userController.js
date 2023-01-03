@@ -11,7 +11,6 @@ const maxSensitiveCookieAge = 3000 // 5 Minutes
 
 
 // Login User
-// Param: req.body.username, req.body.password
 const login = async (req, res, next) => {
     // Validate User Input
     const {error} = validateLoginInput(req.body); 

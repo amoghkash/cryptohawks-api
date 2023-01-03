@@ -9,6 +9,10 @@ const cors=require("cors");
 
 // Create MongoDB Connection
 mongoose.connect("mongodb+srv://urbanarobotics:cryptohawks@userdb.gmtmp2l.mongodb.net/MikeOxlong?retryWrites=true&w=majority");
+<<<<<<< Updated upstream
+=======
+mongoose.set('strictQuery', true);
+>>>>>>> Stashed changes
 const database = mongoose.connection
 
 // Throw error if there is an error connection
@@ -29,7 +33,15 @@ const app = express(); // Create Express App
 // Setup CORS Settings  
 // Must be before express.json()
 app.use(cors({
+<<<<<<< Updated upstream
     origin:'https://amoghkash.github.io', // Prod Link: 'https://amoghkash.github.io'  Dev Link: 'http://localhost:5173'
+=======
+    origin:[
+        'http://localhost:5173',    // Dev Link:
+        'https://amoghkash.github.io', // Prod Link:
+        'http://localhost:4173' // Dev Build Link
+    ],
+>>>>>>> Stashed changes
     credentials:true,
     allowedHeaders:'Content-Type,Authorization',
     optionsSuccessStatus: 200
@@ -63,9 +75,8 @@ app.get('/api', (req, res) => {
 });
 
 app.get('/version', (req, res) => {
-    res.json({"id":"1.0.0"});
+    res.json({"id":"1.1.0"});
     res.status(200)
-    res.send()
     res.end()
 });
 

@@ -123,15 +123,27 @@ async function addUserToDB(req, res) {
         - Implemented in taskController.js
 */
 async function addTaskToUser(targetUser, taskUID) {
+    // Check if user has task already, if so don't add
+    const exists = await User.count({
+        username: targetUser,
+        tasks: { $in: [taskUID] }
+        });
+    //console.log(exists) // For Debug
+    if(exists>=1) {
+        //console.log("task exists in user array already") // For Debug
+        return 0
+    }
+    
     // Update User Task
     User.findOneAndUpdate(
     { username: targetUser}, 
     { $push: { tasks: taskUID  } }, // Push taskID to array
     function (error, success) {
             if (error) {
-                console.log(error);
+                console.log("Error Updating Task:") // For Debug
+                console.log(error); // For Debug
             } else {
-                console.log(success);
+                //console.log(success);
             }
     });
 }
@@ -140,10 +152,23 @@ async function addTaskToUser(targetUser, taskUID) {
 
 // db_removeTask
 // TODO - Create Function to remove task from user profile
-
+async function db_removeTaskFromUser(targetUser, taskUID) {
+    // Update User Task
+    taskUID = Number(taskUID)
+    User.findOneAndUpdate(
+    { username: targetUser}, 
+    { $pullAll: { tasks: [taskUID]  } }, // Push taskID to array
+    function (error, success) {
+            if (error) {
+                console.log(error); // For Debug
+            } else {
+                console.log(success); // For Debug
+            }
+    });
+}
 
 // Export Functions
-module.exports = { getUserFromDB, addUserToDB, getAllUserFromDB, addTaskToUser};
+module.exports = { getUserFromDB, addUserToDB, getAllUserFromDB, addTaskToUser, db_removeTaskFromUser};
 
 
 

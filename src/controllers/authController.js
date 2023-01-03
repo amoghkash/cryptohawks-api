@@ -9,7 +9,7 @@ function validateUser(req, userObject) {
         return false;
     }
 };
-// TODO - Deprecate function or move to /scripts
+// TODO - Deprecate function or move to /scripts or have this function get user data from cloud and compare
 
 // Export Function
 module.exports = { validateUser }

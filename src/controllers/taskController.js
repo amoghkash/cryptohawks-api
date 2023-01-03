@@ -1,8 +1,8 @@
 // Import Packages and Modules
-const {db_createTask, db_getTask, db_updateTask} = require('../db/taskDB')
+const {db_createTask, db_getTask, db_updateTask, db_deleteTask} = require('../db/taskDB')
 const {validateTaskCreation} = require('../scripts/inputValidation')
 const {getNextUID} = require('../db/taskDB')
-const {getUserFromDB, addTaskToUser} = require('../db/userDB')
+const {getUserFromDB, addTaskToUser, db_removeTaskFromUser} = require('../db/userDB')
 
 
 
@@ -37,7 +37,7 @@ const createTask = async (req, res, next) => {
             res.status(201); // Set Response Status
 
             // Adds Task to User Data
-            addTaskToUser(user.username, success.uid) 
+            await addTaskToUser(user.username, success.uid) 
 
         }else { // If Task is not Created
             responseJSON = {
@@ -73,25 +73,29 @@ const getTask = async (req, res, next) => {
     var task = await db_getTask(taskID);
 
     // Get Assignee from Database
-    var user = await getUserFromDB(task.assignee);
-    //console.log(task) // For Debug
 
-    if(task) {  // If task exists
-        responseJSON = {
-            title: task.title,
-            description: task.description,
-            taskID: task.uid,
-            assignee: user.name,
-            startDate: task.startDate,
-            endDate: task.endDate,
-            progress: task.percentCompleted,
-            type: task.type
+    if(task.assignee){
+        var user = await getUserFromDB(task.assignee);
+        //console.log(task) // For Debug
+
+        if(task) {  // If task exists
+            responseJSON = {
+                title: task.title,
+                description: task.description,
+                taskID: task.uid,
+                assignee: user.name,
+                startDate: task.startDate,
+                endDate: task.endDate,
+                progress: task.percentCompleted,
+                type: task.type
+            }
+            res.status(200); // Set Response Status
         }
-        res.status(200); // Set Response Status
-    }
 
-    // Send Response 
+        // Send Response 
+    }
     res.json(responseJSON).end()
+    
 }
 
 
@@ -121,6 +125,31 @@ const updateTask = async (req, res, next) => {
     res.json(responseJSON).end()
 }
 
+// Delete Task
+// Param: req.body
+const deleteTask = async (req, res, next) => {
+    //console.log('delete') // For Debug
+    // Response Declaration
+    var responseJSON;
+
+    // Update Task in Database
+    const task = await db_getTask(req.params.taskID)
+
+    const status = await db_deleteTask(req.params.taskID)
+
+    await db_removeTaskFromUser(task.assignee,req.params.taskID)
+    
+    if(status) {    // If update is successful
+        responseJSON = {
+            valid:true, 
+            issue: "Deleted"
+        }
+        res.status(200); // Set Response Status
+    }
+
+    // Send Response
+    res.json(responseJSON).end()
+}
 
 
 
@@ -130,7 +159,6 @@ const returnAllTasks = async (req, res, next) => {
     
     // Response Declaration
     let returnObject = {}
-
     // Get Total Number of Tasks
     let numTasks = await getNextUID()
 
@@ -139,7 +167,6 @@ const returnAllTasks = async (req, res, next) => {
         
         // Get Task from Database
         let task = await db_getTask(index)
-
         var user;   // Create User Variable
 
         if(task){   // If Task Exists
@@ -162,4 +189,4 @@ const returnAllTasks = async (req, res, next) => {
 
 
 // Export Functions
-module.exports = { createTask, getTask, updateTask, returnAllTasks }
+module.exports = { createTask, getTask, updateTask, deleteTask, returnAllTasks }
