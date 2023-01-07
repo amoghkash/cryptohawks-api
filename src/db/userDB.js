@@ -1,6 +1,5 @@
 // Import Packages & Modules
 const { User } = require('../models/userSchema');
-const mongoose = require('mongoose');
 const { changeCollection } = require('./connectDB') ;
 
 
@@ -124,13 +123,10 @@ async function addUserToDB(req, res) {
 */
 async function addTaskToUser(targetUser, taskUID) {
     // Check if user has task already, if so don't add
-    const exists = await User.count({
-        username: targetUser,
-        tasks: { $in: [taskUID] }
-        });
-    //console.log(exists) // For Debug
-    if(exists>=1) {
-        //console.log("task exists in user array already") // For Debug
+    const user = await User.findOne({ username: targetUser })
+    var array = user.tasks
+    if(array.includes(taskUID)) {
+        console.log("exists") // For Debug
         return 0
     }
     
@@ -143,10 +139,10 @@ async function addTaskToUser(targetUser, taskUID) {
                 console.log("Error Updating Task:") // For Debug
                 console.log(error); // For Debug
             } else {
+                //console.log("Successfully added task")
                 //console.log(success);
             }
-    });
-}
+    });}
 // TODO - Change Function Name
 
 
@@ -155,14 +151,19 @@ async function addTaskToUser(targetUser, taskUID) {
 async function db_removeTaskFromUser(targetUser, taskUID) {
     // Update User Task
     taskUID = Number(taskUID)
+    
     User.findOneAndUpdate(
     { username: targetUser}, 
     { $pullAll: { tasks: [taskUID]  } }, // Push taskID to array
     function (error, success) {
             if (error) {
+                console.log("removing task Error")
                 console.log(error); // For Debug
+                return false
             } else {
-                console.log(success); // For Debug
+                //console.log("Successfully removed task")
+                //console.log(success); // For Debug
+                return true
             }
     });
 }

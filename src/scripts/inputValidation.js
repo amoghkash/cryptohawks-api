@@ -61,7 +61,8 @@ function validateTaskCreation(task) {
         assignee: Joi.string(),
         startDate: Joi.date(),
         endDate: Joi.date(),
-        type: Joi.string().required()
+        type: Joi.string().required(),
+        assignedTo: [Joi.string(), Joi.array(), Joi.object]
     }); // Create Task Schema
 
     return schema.validate(task); // Validate Schema
@@ -69,5 +70,19 @@ function validateTaskCreation(task) {
 // TODO - Change Schema
 
 
+
+
+
+function validateUpdateCreation(update) {
+    const schema = Joi.object({
+        title: Joi.string().max(100).required(),
+        description: Joi.string().required(),
+        assignedTo: Joi.required(),
+        createdBy: Joi.string().required()
+    }); // Create Task Schema
+
+    return schema.validate(update); // Validate Schema
+}
+
 // Export Functions
-module.exports = { validateSignupInput, validateLoginInput, validateTaskCreation};
+module.exports = { validateSignupInput, validateLoginInput, validateTaskCreation, validateUpdateCreation};

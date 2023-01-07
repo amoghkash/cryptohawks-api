@@ -56,10 +56,12 @@ const port = process.env.PORT;
 // Import Modules and Files
 const userRouter = require('./routes/user');
 const taskRouter = require('./routes/task');
+const updateRouter = require('./routes/update')
 
 // Link Routers
 app.use('/user', userRouter);
 app.use('/task', taskRouter);
+app.use('/update', updateRouter);
 
 // Get Request to Main API Link
 // Validates that API is live

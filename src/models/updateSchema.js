@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 
 // Create Schema
-const TaskSchema = new mongoose.Schema({
+const UpdateSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -18,38 +18,26 @@ const TaskSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    assignee: {
-        type: String,
-    },
-    isCompleted: {
-        type: Boolean,
-        required: true,
-    },
-    percentCompleted: {
-        type: Number,
-        required: true,
-    },
-    startDate: {
-        type: Date,
-    },
-    endDate: {
-        type: Date
-    },
-    type: {
-        type: String,
-        required: true,
-    },
     assignedTo: {
         type: Array,
+        required: true
     },
+    postDate: {
+        type: Date,
+        required: true
+    },
+    createdBy:{
+        type:String,
+        required: true
+    }
 });
 // TODO - Change "Assignee" to Owner or Responsible
 // TODO - Add support for multiple assignee
 
 
 // Connect Schema to collection in a model
-const Task = mongoose.model('tasks', TaskSchema);
+const Update = mongoose.model('updates', UpdateSchema);
 
 
 // Export Model
-module.exports ={ Task };
+module.exports ={ Update };

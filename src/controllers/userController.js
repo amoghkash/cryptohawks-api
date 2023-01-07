@@ -174,13 +174,13 @@ const returnUserTaskList = async (req, res, next) => {
     let req_username = req.params.username;
 
     // Get User Data
-    const userdata_temp = await getUserFromDB(req_username)
+    var userdata = await getUserFromDB(req_username)
 
     // Response Declaration
-    let returnObject = {}
+    let responseJSON = {}
 
-    if(userdata_temp) { // If user exists
-        const userdata = userdata_temp.toJSON(); // Convert Mongoose Doc to JSON object
+    if(userdata) { // If user exists
+        userdata = userdata.toJSON(); // Convert Mongoose Doc to JSON object
         let taskArray = userdata.tasks // Get the list of Task UID's from User
         
         // Loop through array of tasks and add them to response
@@ -188,28 +188,35 @@ const returnUserTaskList = async (req, res, next) => {
             const element = taskArray[index]; // Get Task UID
             task = await db_getTask(element) // Get Task
             
-            if(task){ // If Task Exists
+            if(task){   // If Task Exists
+                if(task.assignee){
+                    var user = await getUserFromDB(task.assignee);
+                    //console.log(task) // For Debug
+                    task.assignee = task.assignee
+                    task.string_assignee=user.name
+            }
                 
-                // User Declaration
-                var user;
-
-                if(task.assignee){ // If task has an assignee
-                    user = await getUserFromDB(task.assignee) // Get Assignee Data
+                var sendArray = []
+                if(task.assignedTo) {
+                    var usernames_list = task.assignedTo
+                    for (let index = 0; index < usernames_list.length; index++) {
+                        const element = usernames_list[index];
+                        var user= await getUserFromDB(element);
+                        sendArray[index] = user.name
+                    }
                 }
-
-                if(user){ // If assignee exists
-                    task.assignee=user.name // Set task field assignee to the assignee name
-                }
-
-                // Save task in return object
-                returnObject[index] = task
+                task.assignedTo=task.assignedTo
+                task.string_assignedTo=sendArray
+            
+                
+                responseJSON[index] = task // Add task to returnObject
             }
         }
         res.status(200) // Set Response Status
     }
 
     // Send Response
-    res.json(returnObject)
+    res.json(responseJSON)
     res.end()
 }
 

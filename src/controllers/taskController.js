@@ -13,16 +13,24 @@ const createTask = async (req, res, next) => {
     const {error} = validateTaskCreation(req.body);
     
     // Response Declaration
-    var responseJSON
+    var responseJSON ={};
 
     if(!error) { // If Input is Validated
-
+        var user = await getUserFromDB(req.body.assignee.trim()) 
+        if(!user){
+            responseJSON = {
+                valid:false,
+                issue: "Assignee does not exist" // Error Message
+            }
+            res.status(400)
+            res.json(responseJSON).end()
+            return(0)
+        }
+    
         // Save user to database
         var success = await db_createTask(req, res);
 
         // Get Assignee from Database
-        var user = await getUserFromDB(success.assignee) 
-
         if(success) { // If Task is Successfully Created
             responseJSON = {
                 valid: true,
@@ -32,7 +40,8 @@ const createTask = async (req, res, next) => {
                 assignee: user.name,
                 startDate: success.startDate,
                 endDate: success.endDate,
-                type: success.type
+                type: success.type,
+                assignedTo: success.assignedTo
             }
             res.status(201); // Set Response Status
 
@@ -73,27 +82,48 @@ const getTask = async (req, res, next) => {
     var task = await db_getTask(taskID);
 
     // Get Assignee from Database
+    if(task) {  // If task exists
+        responseJSON = {
+            title: task.title,
+            description: task.description,
+            taskID: task.uid,
+            startDate: task.startDate,
+            endDate: task.endDate,
+            progress: task.percentCompleted,
+            type: task.type,        }
+        res.status(200); // Set Response Status
+    } else {
+        responseJSON ={
+            valid: true,
+            issue: "No task found"
+        }
+        res.json(responseJSON).end()
+        return 0
+    }
 
     if(task.assignee){
         var user = await getUserFromDB(task.assignee);
         //console.log(task) // For Debug
+        responseJSON.assignee = task.assignee
+        responseJSON.string_assignee=user.name
+    }
 
-        if(task) {  // If task exists
-            responseJSON = {
-                title: task.title,
-                description: task.description,
-                taskID: task.uid,
-                assignee: user.name,
-                startDate: task.startDate,
-                endDate: task.endDate,
-                progress: task.percentCompleted,
-                type: task.type
-            }
-            res.status(200); // Set Response Status
+    
+    if(task.assignedTo) {
+        var sendArray = []
+        var usernames_list = task.assignedTo
+        for (let index = 0; index < usernames_list.length; index++) {
+            const element = usernames_list[index];
+            var user= await getUserFromDB(element);
+            sendArray[index] = user.name
         }
+        responseJSON.assignedTo=task.assignedTo
+        responseJSON.string_assignedTo=sendArray
+    }  
+    
 
         // Send Response 
-    }
+    
     res.json(responseJSON).end()
     
 }
@@ -131,13 +161,20 @@ const deleteTask = async (req, res, next) => {
     //console.log('delete') // For Debug
     // Response Declaration
     var responseJSON;
+    var taskID = req.params.taskID
 
     // Update Task in Database
-    const task = await db_getTask(req.params.taskID)
+    const task = await db_getTask(taskID)
 
-    const status = await db_deleteTask(req.params.taskID)
+    const status = await db_deleteTask(taskID)
 
-    await db_removeTaskFromUser(task.assignee,req.params.taskID)
+    await db_removeTaskFromUser(task.assignee,taskID)
+
+    var array = task.assignedTo
+    for (let index = 0; index < array.length; index++) {
+        const username = array[index];
+        db_removeTaskFromUser(username, taskID)
+    }
     
     if(status) {    // If update is successful
         responseJSON = {
@@ -158,7 +195,7 @@ const deleteTask = async (req, res, next) => {
 const returnAllTasks = async (req, res, next) => {
     
     // Response Declaration
-    let returnObject = {}
+    let responseJSON = {}
     // Get Total Number of Tasks
     let numTasks = await getNextUID()
 
@@ -167,22 +204,34 @@ const returnAllTasks = async (req, res, next) => {
         
         // Get Task from Database
         let task = await db_getTask(index)
-        var user;   // Create User Variable
 
         if(task){   // If Task Exists
-
-
-            if(task.assignee){  // If Task Has an assignee
-                user = await getUserFromDB(task.assignee)   // Get user from database
+            if(task.assignee){
+                var user = await getUserFromDB(task.assignee);
+                //console.log(task) // For Debug
+                task.assignee = task.assignee
+                task.string_assignee=user.name
+        }
+            
+            var sendArray = []
+            if(task.assignedTo) {
+                var usernames_list = task.assignedTo
+                for (let index = 0; index < usernames_list.length; index++) {
+                    const element = usernames_list[index];
+                    var user= await getUserFromDB(element);
+                    sendArray[index] = user.name
+                }
             }
-            if(user){ // If user exists
-                task.assignee=user.name // Set task assignee to User's name
-            }
-            returnObject[index] = task // Add task to returnObject
+            task.assignedTo=task.assignedTo
+            task.string_assignedTo=sendArray
+        
+            
+            responseJSON[index] = task // Add task to returnObject
         }
     }
+
     res.status(200) // Set Response Status
-    res.json(returnObject) // Set Response Body
+    res.json(responseJSON) // Set Response Body
     res.end() // Send Response
 }
 // TODO - Add admin status validation

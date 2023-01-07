@@ -1,6 +1,5 @@
 const { changeCollection } = require('./connectDB') 
 const { Task } = require('../models/taskSchema')
-const mongoose = require('mongoose');
 const {getUserFromDB, addTaskToUser, db_removeTaskFromUser} = require('../db/userDB')
 
 // Function Name: db_createTask
@@ -30,6 +29,18 @@ async function db_createTask(req, res) {
         assigneeVar= req.body.assignee // Assignee is set
     }
 
+    var array_assignedTo = []
+    var obj_assignedTo = req.body.assignedTo
+    for(var key in obj_assignedTo) {
+        var obj = obj_assignedTo[key];
+        array_assignedTo.push(obj.label)
+    }
+    console.log(array_assignedTo)
+
+    array_assignedTo.forEach(async element => {
+        await addTaskToUser(element, taskID);
+    });
+
     // Create new task
     let task = new Task({
         title: req.body.title.trim(),
@@ -40,11 +51,13 @@ async function db_createTask(req, res) {
         percentCompleted: 0,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        type: req.body.type
+        type: req.body.type,
+        assignedTo: array_assignedTo
     });
     
     // Save Task into Database
     await task.save()
+    
 
     // Return Task
     return task
@@ -72,23 +85,17 @@ async function db_getTask(taskUID) {
 
     // Find task
     let task = await Task.findOne({ uid: taskUID });
-
+    
     if(task==null) { // If task not found
+        return false
     } else{ // If Task Found
         task = task.toJSON() // Convert task to JSON
-        if (task) { // If task still exists
-            
-            // Delete sensitive task variables
-            delete task.__v 
-            delete task._id
+        // Delete sensitive task variables
+        delete task.__v 
+        delete task._id
 
-            // Return Task
-            return task
-        } else {
-
-            // TODO - Remove response status
-            res.status(404);
-        }
+        // Return Task
+        return task
     }
 }
 // FIXME - Fix all task handling
@@ -131,8 +138,8 @@ async function db_updateTask(taskUID, req) {
 
     // If assignee exists in req.body, update it
     if(req.body.assignee) {
-        db_removeTaskFromUser(task.assignee, taskUID);
-        addTaskToUser(req.body.assignee, taskUID);
+        db_removeTaskFromUser(task.assignee, task.uid);
+        addTaskToUser(req.body.assignee, task.uid);
         task.assignee = req.body.assignee // Set New Assignee
         //TODO: Add support to remove task from current assignee
     }
@@ -159,6 +166,37 @@ async function db_updateTask(taskUID, req) {
         task.endDate=req.body.endDate // Set New endDate
     }
 
+    if(req.body.assignedTo){
+        var new_assignedTo = []
+        var obj_assignedTo = req.body.assignedTo
+        for(var key in obj_assignedTo) {
+            var obj = obj_assignedTo[key];
+            new_assignedTo.push(obj.label)
+        }
+
+        var old_assignedTo = task.assignedTo
+        //console.log(old_assignedTo) // For Debug
+        //console.log(new_assignedTo) // For Debug
+
+        let differenceAdd = new_assignedTo.filter(x => !old_assignedTo.includes(x));
+        let differenceRemove = old_assignedTo.filter(x => !new_assignedTo.includes(x))
+        //console.log("to add " + differenceAdd) // For Debug
+        //console.log("to remove " + differenceRemove) // For Debug
+        differenceAdd.forEach(async element => {
+            await addTaskToUser(element.trim(), task.uid);
+        });
+
+        differenceRemove.forEach(async element => {
+            if(element == task.assignee){
+                return
+            }
+            await db_removeTaskFromUser(element.trim(), task.uid);
+            
+        });
+
+        task.assignedTo = new_assignedTo
+
+    }
     //console.log(task) // For Debug
 
     // Save Task to Database
