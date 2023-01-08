@@ -33,7 +33,8 @@ app.use(cors({
     origin:[
         'http://localhost:5173',    // Dev Link:
         'https://amoghkash.github.io', // Prod Link:
-        'http://localhost:4173' // Dev Build Link
+        'http://localhost:4173', // Dev Build Link
+        'http://portal.cryptohawks8726.org'
     ],
     credentials:true,
     allowedHeaders:'Content-Type,Authorization',
