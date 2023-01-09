@@ -87,13 +87,19 @@ async function addUserToDB(req, res) {
         return false;
     } else { // Create User
         // Create new user
+        let gradeNum;
+        if(!req.body.grade[0]){
+            gradeNum = 9
+        } else {
+            gradeNum = req.body.grade[0].content
+        }
         user = new User({
             username: inputUsername,
             name: req.body.name.trim(),
             password: req.body.password.trim(),
             subteam: req.body.subteam,
             tasks: [0],
-            grade: req.body.grade[0].content,
+            grade: gradeNum,
             admin: req.body.admin
         });
 
