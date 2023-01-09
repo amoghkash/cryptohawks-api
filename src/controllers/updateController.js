@@ -31,11 +31,6 @@ const getAllUpdates = async (req, res, next) => {
         let update = await db_getUpdate(index)
         if(update){   // If Task Exists
             returnObject[index] = update // Add task to returnObject
-        } else {
-            res.status(500)
-            res.json(returnObject)
-            res.end()
-            return 0
         }
     }
     res.status(200) // Set Response Status
