@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser')
 const cors=require("cors");
 
 // Create MongoDB Connection
-mongoose.connect("mongodb+srv://urbanarobotics:cryptohawks@userdb.gmtmp2l.mongodb.net/MikeOxlong?retryWrites=true&w=majority");
+mongoose.connect("");
 mongoose.set('strictQuery', true);
 const database = mongoose.connection
 
